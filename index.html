@@ -8,16 +8,6 @@
     <link rel="manifest" href="/manifest.json">
     
     <style>
-        :root {
-            --color-primary: #111827;
-            --color-secondary: #6b7280;
-            --color-background: #f9fafb;
-            --color-white: white;
-            --color-red: #dc2626;
-            --color-green: #10b981;
-            --color-yellow: #d97706;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -26,59 +16,25 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-            background: var(--color-background);
+            background: #f9fafb;
             min-height: 100vh;
-            color: var(--color-primary);
-            padding-bottom: 70px; /* フッターの高さ分を確保 */
-        }
-        
-        /* Navigation (タイトルのみ残す) */
-        .nav {
-            border-bottom: 1px solid #e5e7eb;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            position: sticky;
-            top: 0;
-            z-index: 50;
-        }
-        
-        .nav-content {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 1rem 2rem;
             display: flex;
-            align-items: center;
-            justify-content: flex-start; /* 左寄せに変更 */
+            flex-direction: column;
         }
         
-        .nav h1 {
-            font-size: 1.5rem;
-            font-weight: 300;
-            letter-spacing: -0.025em;
-            color: var(--color-primary);
-        }
-        
-        /* 以前の.nav-statusはフッターに移動 */
-        
-        .container {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 2rem 2rem; /* ヘッダー削除に伴い上部のパディングを調整 */
-            padding-top: 0rem;
-        }
-        
-        /* Login Section */
+        /* ログイン画面のスタイル */
         .login-section {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: calc(100vh - 70px - 70px); /* 画面全体からナビとフッターを引いた高さ */
+            min-height: 100vh;
             text-align: center;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }
         
         .login-card {
-            background: var(--color-white);
+            background: white;
             border-radius: 1rem;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             border: 1px solid #e5e7eb;
@@ -90,14 +46,14 @@
         .login-card h2 {
             font-size: 2rem;
             font-weight: 300;
-            color: var(--color-primary);
+            color: #111827;
             margin-bottom: 1rem;
             letter-spacing: -0.025em;
         }
         
         .login-card p {
             font-size: 1rem;
-            color: var(--color-secondary);
+            color: #6b7280;
             font-weight: 300;
             margin-bottom: 2rem;
             line-height: 1.6;
@@ -111,7 +67,7 @@
             width: 100%;
             padding: 0.75rem 1.5rem;
             background: #4285f4;
-            color: var(--color-white);
+            color: white;
             border: none;
             border-radius: 0.75rem;
             font-size: 1rem;
@@ -126,264 +82,128 @@
             box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
         }
         
-        /* Main Content */
+        /* メインコンテンツ（チャット風） */
         .main-content {
             display: none;
+            flex: 1;
+            flex-direction: column;
+            height: 100vh;
         }
         
-        /* Header Section (非表示) */
+        /* ヘッダー */
         .header {
-            display: none;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
-        /* Status (フッターに移動) */
-        .status-footer {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            font-size: 0.875rem;
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 300;
+            color: #111827;
         }
-
-        .status-footer .status {
-            padding: 0.375rem 0.75rem;
-            margin: 0;
+        
+        .status {
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 500;
         }
         
         .status.disconnected {
             background: #fef2f2;
-            color: var(--color-red);
-            border: 1px solid #fecaca;
+            color: #dc2626;
         }
         
         .status.connecting {
             background: #fffbeb;
-            color: var(--color-yellow);
-            border: 1px solid #fed7aa;
+            color: #d97706;
         }
         
         .status.connected {
-            background: #f0fdf4;
-            color: var(--color-green);
-            border: 1px solid #bbf7d0;
+            background: #dcfce7;
+            color: #166534;
         }
         
-        /* Main Grid */
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 3rem;
-            margin-bottom: 0rem; 
-        }
-        
-        .card {
-            background: var(--color-white);
-            border-radius: 1rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e5e7eb;
-            overflow: hidden;
-            transition: all 0.5s ease;
-        }
-        
-        .card-header {
-            border-bottom: 1px solid #f3f4f6;
-            padding: 2rem;
+        .user-info {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            gap: 0.75rem;
         }
         
-        .card-title {
-            font-size: 1.125rem;
-            font-weight: 500;
-            color: var(--color-primary);
-            letter-spacing: -0.025em;
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #e5e7eb;
         }
         
-        .card-subtitle {
-            color: var(--color-secondary);
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-        
-        .card-content {
-            padding: 2rem;
-        }
-        
-        /* Form Elements (省略) */
-        input, button, textarea {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-        
-        /* Message Section */
-        .input-area {
-            position: relative;
-        }
-        
-        textarea {
-            height: 6rem;
-            resize: vertical;
-            padding-right: 5rem;
-        }
-        
-        .input-buttons {
-            position: absolute;
-            right: 0.5rem;
-            top: 0.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.25rem;
-        }
-        
-        .input-btn {
-            width: 2rem;
-            height: 2rem;
-            border-radius: 0.375rem;
-            border: 1px solid #d1d5db;
-            cursor: pointer;
-            font-size: 0.625rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .file-btn {
-            background: #16a34a;
+        .logout-btn {
+            background: #dc2626;
             color: white;
-            border-color: #16a34a;
-        }
-        
-        .paste-btn {
-            background: #0ea5e9;
-            color: white;
-            border-color: #0ea5e9;
-        }
-        
-        .input-btn:hover:not(:disabled) {
-            transform: scale(1.05);
-        }
-        
-        /* Drop Zone */
-        .drop-zone {
-            border: 2px dashed #d1d5db;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            text-align: center;
-            color: var(--color-secondary);
-            margin: 1rem 0;
-            transition: all 0.3s ease;
-            font-size: 0.875rem;
-        }
-        
-        .drop-zone.dragover {
-            border-color: var(--color-secondary);
-            background: #f9fafb;
-            color: var(--color-primary);
-        }
-        
-        /* File Preview */
-        .preview-container {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin: 1rem 0;
-            padding: 1rem;
-            background: #f9fafb;
-            border-radius: 0.75rem;
-            border: 1px solid #e5e7eb;
-        }
-        
-        .file-details {
-            flex: 1;
-        }
-        
-        .file-icon {
-            width: 3rem;
-            height: 3rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f3f4f6;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.5rem;
-            font-size: 0.625rem;
-            font-weight: 700;
-            color: var(--color-secondary);
-        }
-        
-        .image-preview {
-            max-width: 9rem;
-            max-height: 9rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-        }
-        
-        .file-info {
-            font-size: 0.75rem;
-            color: var(--color-secondary);
-            margin-top: 0.25rem;
-        }
-        
-        .clear-btn {
-            margin-top: 0.5rem;
-            padding: 0.375rem 0.75rem;
-            font-size: 0.75rem;
-            background: var(--color-red);
-            color: var(--color-white);
             border: none;
+            padding: 0.375rem 0.75rem;
             border-radius: 0.375rem;
             cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
         }
         
-        /* Message History */
-        .message-history {
-            background: #f9fafb;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-            max-height: 18rem;
+        /* メッセージエリア（メイン） */
+        .message-area {
+            flex: 1;
+            padding: 1rem;
             overflow-y: auto;
-            border: 1px solid #e5e7eb;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }
         
         .message {
-            margin: 0.75rem 0;
-            padding: 0.75rem 1rem;
-            border-radius: 1rem;
-            max-width: 80%;
+            max-width: 70%;
+            margin: 1rem 0;
+            padding: 1rem 1.5rem;
+            border-radius: 1.5rem;
             word-wrap: break-word;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             white-space: pre-wrap;
         }
         
         .message.sent {
-            background: var(--color-primary);
-            color: var(--color-white);
+            background: #3b82f6;
+            color: white;
             margin-left: auto;
-            text-align: right;
+            border-bottom-right-radius: 0.5rem;
         }
         
         .message.received {
-            background: #e0f2fe;
-            color: #0277bd;
+            background: white;
+            color: #374151;
             margin-right: auto;
+            border-bottom-left-radius: 0.5rem;
         }
         
         .message-time {
             font-size: 0.75rem;
             opacity: 0.7;
-            margin-top: 0.375rem;
+            margin-top: 0.5rem;
         }
         
-        /* File Messages (省略) */
+        /* コピーボタン */
+        .copy-btn {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            margin-top: 0.5rem;
+            background: rgba(255,255,255,0.3);
+            border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 0.25rem;
+            cursor: pointer;
+            color: inherit;
+        }
+        
+        /* ファイルメッセージ */
         .file-message {
             max-width: 18rem;
         }
@@ -398,7 +218,7 @@
         
         .file-download {
             background: #2563eb;
-            color: var(--color-white);
+            color: white;
             border: none;
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
@@ -407,7 +227,174 @@
             margin-top: 0.75rem;
         }
         
-        /* Image Overlay (省略) */
+        .image-preview {
+            max-width: 100%;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .save-btn {
+            margin-top: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+        }
+        
+        /* 入力エリア（下部固定） */
+        .input-area {
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            padding: 1rem 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .file-preview-area {
+            flex: 1;
+            min-height: 3rem;
+            border: 2px dashed #d1d5db;
+            border-radius: 1rem;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9fafb;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .file-preview-area.has-content {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            border-style: solid;
+        }
+        
+        .file-preview-area.dragover {
+            border-color: #3b82f6;
+            background: #dbeafe;
+            transform: scale(1.02);
+        }
+        
+        .message-input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 1rem;
+            resize: none;
+            min-height: 2rem;
+            max-height: 6rem;
+            font-family: inherit;
+        }
+        
+        .message-input::placeholder {
+            color: #9ca3af;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            width: 3rem;
+            height: 3rem;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .file-btn {
+            background: #10b981;
+            color: white;
+        }
+        
+        .paste-btn {
+            background: #0ea5e9;
+            color: white;
+        }
+        
+        .send-btn {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .action-btn:hover:not(:disabled) {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .action-btn:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* ファイルプレビュー */
+        .file-preview {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            width: 100%;
+        }
+        
+        .file-icon {
+            width: 2rem;
+            height: 2rem;
+            background: #3b82f6;
+            color: white;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        
+        .preview-img {
+            max-width: 3rem;
+            max-height: 3rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .file-size {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+        
+        .remove-file {
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 0.375rem;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        
+        /* 画像オーバーレイ */
         .image-overlay {
             position: fixed;
             top: 0;
@@ -422,13 +409,51 @@
             cursor: pointer;
         }
         
-        /* Loading (省略) */
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0.75rem 1rem;
+            }
+            
+            .header h1 {
+                font-size: 1.25rem;
+            }
+            
+            .input-area {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .action-buttons {
+                align-self: stretch;
+                justify-content: space-around;
+            }
+            
+            .action-btn {
+                flex: 1;
+                border-radius: 0.75rem;
+                max-width: none;
+                height: 2.5rem;
+            }
+            
+            .message {
+                max-width: 85%;
+                padding: 0.75rem 1rem;
+            }
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        /* ローディング */
         .loading {
             display: inline-block;
             width: 1rem;
             height: 1rem;
             border: 2px solid #f3f3f3;
-            border-top: 2px solid var(--color-secondary);
+            border-top: 2px solid #6b7280;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -437,83 +462,9 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        /* フッター (新規追加/移動) */
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            border-top: 1px solid #e5e7eb;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            z-index: 50;
-        }
-        
-        .footer-content {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0.75rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .footer .user-info {
-            display: none; /* 初期は非表示 */
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .footer .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid #e5e7eb;
-        }
-        
-        .footer .logout-btn {
-            background: var(--color-red);
-            color: var(--color-white);
-            border: none;
-            padding: 0.375rem 0.75rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        /* Login時のフッターに配置するボタン */
-        .footer .login-btn-container {
-            display: none;
-        }
-        
-        .footer .google-signin-btn-footer {
-            background: #4285f4;
-            color: var(--color-white);
-            border: none;
-            padding: 0.375rem 0.75rem;
-            border-radius: 0.375rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        @media (max-width: 768px) {
-            .footer-content {
-                padding: 0.5rem 1rem;
-            }
-        }
-        /* ... (その他のメディアクエリは省略) ... */
     </style>
 </head>
 <body>
-    <nav class="nav">
-        <div class="nav-content">
-            <h1>P2TrancePrivate</h1>
-        </div>
-    </nav>
-
     <div class="login-section" id="loginSection">
         <div class="login-card">
             <h2>P2TrancePrivate</h2>
@@ -530,53 +481,42 @@
         </div>
     </div>
 
-    <div class="container main-content" id="mainContent">
-        <div class="header" style="display: none;">
+    <div class="main-content" id="mainContent">
+        <div class="header">
+            <h1>P2TrancePrivate</h1>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="status disconnected" id="status">
+                    デバイス検索中...
+                </div>
+                <div class="user-info" id="userInfo" style="display: none;">
+                    <img id="userAvatar" class="user-avatar" src="" alt="ユーザーアバター">
+                    <span id="userName" style="font-size: 0.875rem;"></span>
+                    <button class="logout-btn" onclick="handleSignOut()">ログアウト</button>
+                </div>
+            </div>
         </div>
-
-        <div class="main-grid">
-            <div class="card">
-                <div class="card-header">
-                    <div>
-                        <h3 class="card-title">メッセージ & ファイル</h3>
-                        <p class="card-subtitle">テキストメッセージと任意のファイル形式を送信</p>
+        
+        <div class="message-area" id="messageHistory">
+        </div>
+        
+        <div class="input-area">
+            <div class="file-preview-area" id="dropZone">
+                <textarea class="message-input" id="messageInput" placeholder="メッセージを入力してください..." disabled></textarea>
+                <div class="file-preview" id="filePreview" style="display: none;">
+                    <img id="previewImg" class="preview-img" style="display: none;">
+                    <div id="fileIcon" class="file-icon" style="display: none;">FILE</div>
+                    <div class="file-info">
+                        <div class="file-name" id="fileName"></div>
+                        <div class="file-size" id="fileSize"></div>
                     </div>
+                    <button class="remove-file" onclick="clearPreview()">×</button>
                 </div>
-                <div class="card-content">
-                    <div class="drop-zone" id="dropZone">
-                        ファイルをここにドロップするか、下のボタンを使用してください
-                    </div>
-                    
-                    <div class="input-area">
-                        <textarea id="messageInput" placeholder="メッセージを入力..." disabled></textarea>
-                        <div class="input-buttons">
-                            <button class="input-btn file-btn" onclick="selectFile()" title="ファイル選択" disabled id="fileBtn">FILE</button>
-                            <button class="input-btn paste-btn" onclick="pasteText()" title="テキスト貼り付け" disabled id="pasteBtn">PASTE</button>
-                        </div>
-                    </div>
-                    
-                    <input type="file" id="fileInput" onchange="handleFileSelect(event)">
-                    
-                    <div id="filePreview" style="display: none;">
-                        <div class="preview-container">
-                            <div id="previewContainer">
-                                <img id="previewImg" class="image-preview" style="display: none;">
-                                <div id="fileIcon" class="file-icon" style="display: none;">FILE</div>
-                            </div>
-                            <div class="file-details">
-                                <div id="fileName"></div>
-                                <div id="fileSize" class="file-info"></div>
-                                <div id="fileType" class="file-info"></div>
-                                <button onclick="clearPreview()" class="clear-btn">削除</button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button onclick="sendMessage()" id="sendBtn" disabled>送信</button>
-                    
-                    <div class="message-history" id="messageHistory">
-                        </div>
-                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn file-btn" onclick="selectFile()" disabled id="fileBtn">FILE</button>
+                <button class="action-btn paste-btn" onclick="pasteText()" disabled id="pasteBtn">PASTE</button>
+                <button class="action-btn send-btn" id="sendBtn" onclick="sendMessage()" disabled>送信</button>
             </div>
         </div>
     </div>
@@ -585,27 +525,7 @@
         <img id="overlayImg">
     </div>
     
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="status-footer">
-                <div class="status disconnected" id="status">
-                    デバイス検索中...
-                </div>
-            </div>
-            
-            <div class="user-info" id="footerUserInfo">
-                <img id="footerUserAvatar" class="user-avatar" src="" alt="ユーザーアバター">
-                <span id="footerUserName" style="font-size: 0.875rem;"></span>
-                <button class="logout-btn" onclick="handleSignOut()">ログアウト</button>
-            </div>
-            
-            <div class="login-btn-container" id="footerLoginBtnContainer">
-                <button class="google-signin-btn-footer" onclick="handleSignIn()">
-                    Googleでログイン
-                </button>
-            </div>
-        </div>
-    </footer>
+    <input type="file" id="fileInput" onchange="handleFileSelect(event)">
 
     <script type="module">
         import { getFirebaseConfig } from './firebase-config.js';
@@ -613,7 +533,7 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
         import { getDatabase, ref, set, onValue, remove, onDisconnect } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js';
 
-        // Firebase初期化
+        // Firebaseの初期化
         const firebaseConfig = getFirebaseConfig();
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -639,7 +559,6 @@
             },
             signOut: () => signOut(auth),
             onAuthStateChanged: (callback) => onAuthStateChanged(auth, callback),
-            // Realtime Databaseのパス設定
             db: {
                 getDeviceRef: (userId, peerId) => ref(db, `usersOnline/${userId}/${peerId}`),
                 getDevicesRef: (userId) => ref(db, `usersOnline/${userId}`),
@@ -650,7 +569,7 @@
             }
         };
         
-        // PWA: サービスワーカーの登録 (index.htmlの外部に sw.js が必要です)
+        // PWA: サービスワーカーの登録
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
@@ -689,21 +608,14 @@
         const fileIcon = document.getElementById('fileIcon');
         const fileName = document.getElementById('fileName');
         const fileSize = document.getElementById('fileSize');
-        const fileType = document.getElementById('fileType');
         const imageOverlay = document.getElementById('imageOverlay');
         const overlayImg = document.getElementById('overlayImg');
         const loginSection = document.getElementById('loginSection');
         const mainContent = document.getElementById('mainContent');
+        const userInfo = document.getElementById('userInfo');
+        const userName = document.getElementById('userName');
+        const userAvatar = document.getElementById('userAvatar');
 
-        // フッターの要素
-        const footerUserInfo = document.getElementById('footerUserInfo');
-        const footerUserName = document.getElementById('footerUserName');
-        const footerUserAvatar = document.getElementById('footerUserAvatar');
-        const footerLoginBtnContainer = document.getElementById('footerLoginBtnContainer');
-
-        /**
-         * モジュールスコープ外で定義されたグローバル関数
-         */
         window.handleSignIn = async function() {
             if (!window.firebaseAuth) {
                 alert('Firebase認証モジュールがまだ読み込まれていません。しばらく待ってから再度お試しください。');
@@ -723,13 +635,11 @@
                 console.error('Firebase認証モジュールが未定義です。');
                 return;
             }
-            // ログアウト前にデータベースからPeer IDを削除
             if (peer && currentUser) {
                 const db = window.firebaseAuth.db;
                 const devicesRef = db.getDevicesRef(currentUser.id);
                 const deviceRef = db.getDeviceRef(currentUser.id, peer.id);
                 
-                // データベース監視を停止
                 if (peerWatcher) {
                     db.onValue(devicesRef, peerWatcher); 
                     peerWatcher = null;
@@ -747,28 +657,21 @@
             }
         };
 
-        // UIの状態を更新するヘルパー関数
         function updateUI(user) {
             if (user) {
-                // ログイン状態
                 loginSection.style.display = 'none';
-                mainContent.style.display = 'block';
-                footerUserInfo.style.display = 'flex';
-                footerLoginBtnContainer.style.display = 'none';
+                mainContent.style.display = 'flex';
+                userInfo.style.display = 'flex';
 
-                footerUserName.textContent = user.name;
-                footerUserAvatar.src = user.picture;
+                userName.textContent = user.name;
+                userAvatar.src = user.picture;
 
-                // P2P接続を開始
                 initializeP2P();
             } else {
-                // ログアウト状態
                 loginSection.style.display = 'flex';
                 mainContent.style.display = 'none';
-                footerUserInfo.style.display = 'none';
-                footerLoginBtnContainer.style.display = 'block';
+                userInfo.style.display = 'none';
 
-                // 接続をクリーンアップ
                 if (peer) {
                     peer.destroy();
                     peer = null;
@@ -779,7 +682,6 @@
             }
         }
 
-        // Firebase認証の初期化と状態監視
         window.addEventListener('DOMContentLoaded', async () => {
             let attempts = 0;
             const maxAttempts = 50; 
@@ -822,7 +724,6 @@
                 }
             };
             
-            // Peer IDをデバイス固有にすることで、同じアカウントで複数の接続を可能にする
             const deviceSuffix = Math.random().toString(36).substring(2, 8);
             const peerId = 'user-' + currentUser.id.substring(0, 12) + '-' + deviceSuffix;
             peer = new Peer(peerId, peerOptions);
@@ -830,7 +731,6 @@
             peer.on('open', async (id) => {
                 console.log('My peer ID is: ' + id);
                 
-                // Peer IDを Realtime Database に登録
                 const db = window.firebaseAuth.db;
                 const deviceRef = db.getDeviceRef(currentUser.id, id);
                 
@@ -839,12 +739,10 @@
                     name: navigator.userAgent.substring(0, 30), 
                     timestamp: Date.now()
                 });
-                // 切断時の削除を設定
                 db.onDisconnect(deviceRef).remove();
 
                 updateStatus('他のデバイスを検索中...', 'connecting');
                 
-                // 自分のデバイスを監視して接続を確立
                 startPeerDiscovery(id);
                 
                 messageInput.disabled = false;
@@ -862,19 +760,15 @@
             });
         }
         
-        // 自分のアカウントのデバイスのみをディスカバリ
         function startPeerDiscovery(myPeerId) {
             const db = window.firebaseAuth.db;
             const devicesRef = db.getDevicesRef(currentUser.id);
             
-            // 自分のユーザーIDのノードにあるデバイスリストを監視
             peerWatcher = db.onValue(devicesRef, (snapshot) => {
                 const devices = snapshot.val();
                 if (!devices) return;
 
-                // 自分のデバイス一覧をループして接続を試行
                 Object.keys(devices).forEach(peerId => {
-                    // 自分自身、または既に接続済みのピアを除外
                     if (peerId !== myPeerId && !connections.has(peerId)) {
                         tryConnectToUser(peerId);
                     }
@@ -886,7 +780,6 @@
             try {
                 const conn = peer.connect(userId, { reliable: true });
                 setupConnection(conn);
-                // addSystemMessage(`デバイス ${userId} に接続を試行中...`); // ★ 削除
             } catch (err) {
                 console.log('Failed to connect to user:', userId);
             }
@@ -899,14 +792,11 @@
                 
                 updateConnectionStatus();
                 
-                // 初回接続時にユーザー情報を交換
                 conn.send({
                     type: 'user_info',
                     user: currentUser,
                     timestamp: new Date().toISOString()
                 });
-                
-                // addSystemMessage(`${conn.peer} と接続しました`); // ★ 削除
             });
             
             conn.on('data', (data) => {
@@ -918,7 +808,6 @@
                 connections.delete(conn.peer);
                 onlineUsers.delete(conn.peer);
                 updateConnectionStatus();
-                // addSystemMessage(`${conn.peer} との接続が切断されました`); // ★ 削除
             });
             
             conn.on('error', (err) => {
@@ -1028,10 +917,9 @@
             const messageText = document.createElement('div');
             messageText.textContent = message;
             
-            // コピーボタンを追加
             const copyBtn = document.createElement('button');
             copyBtn.textContent = 'コピー';
-            copyBtn.style.cssText = 'font-size: 0.75rem; padding: 0.25rem 0.5rem; margin-top: 0.5rem; background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.5); border-radius: 0.25rem; cursor: pointer; color: inherit;';
+            copyBtn.className = 'copy-btn';
             copyBtn.onclick = (e) => {
                 e.stopPropagation();
                 navigator.clipboard.writeText(message).then(() => {
@@ -1055,8 +943,6 @@
             messageHistory.scrollTop = messageHistory.scrollHeight;
         }
         
-        // ★ addSystemMessage関数は削除されました。
-        
         function addImageMessage(imageData, filename, filesize, type, timestamp, message = '', fromPeer = null) {
             const messageEl = document.createElement('div');
             messageEl.className = `message ${type} image-message`;
@@ -1064,9 +950,7 @@
             const imgEl = document.createElement('img');
             imgEl.src = imageData;
             imgEl.onclick = () => showImageOverlay(imageData);
-            imgEl.style.maxWidth = '100%';
-            imgEl.style.borderRadius = '0.5rem';
-            imgEl.style.cursor = 'pointer';
+            imgEl.className = 'image-preview';
             
             const fileInfoEl = document.createElement('div');
             fileInfoEl.className = 'file-info';
@@ -1088,7 +972,7 @@
 
             const saveBtn = document.createElement('button');
             saveBtn.textContent = '保存';
-            saveBtn.style.cssText = 'margin-top: 0.5rem; padding: 0.375rem 0.75rem; font-size: 0.75rem; background: #10b981; color: white; border: none; border-radius: 0.375rem; cursor: pointer;';
+            saveBtn.className = 'save-btn';
             saveBtn.onclick = () => downloadFile(imageData, filename);
             messageEl.appendChild(saveBtn);
             
@@ -1155,7 +1039,7 @@
         }
         
         function clearMessageHistory() {
-            messageHistory.innerHTML = ''; // ★ 初期メッセージも削除し、完全に空にする
+            messageHistory.innerHTML = '';
         }
         
         function selectFile() {
@@ -1189,13 +1073,14 @@
             
             fileName.textContent = file.name;
             fileSize.textContent = formatFileSize(file.size);
-            fileType.textContent = getFileTypeName(file.type);
-            filePreview.style.display = 'block';
+            filePreview.style.display = 'flex';
+            dropZone.classList.add('has-content');
         }
         
         function clearPreview() {
             selectedFile = null;
             filePreview.style.display = 'none';
+            dropZone.classList.remove('has-content');
             fileInput.value = '';
         }
         
@@ -1322,7 +1207,6 @@
         window.addEventListener('beforeunload', () => {
             connections.forEach(conn => conn.close());
             if (peer) {
-                // Realtime Database から ID を削除
                 if (currentUser) {
                     const db = window.firebaseAuth.db;
                     const deviceRef = db.getDeviceRef(currentUser.id, peer.id);
