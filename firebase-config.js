@@ -9,7 +9,7 @@ const firebaseConfig = {
 };
 
 // Firebase Authentication Provider設定
-export const authProviderConfig = {
+const authProviderConfig = {
     google: {
         // カスタムパラメータがあれば追加
         customParameters: {
@@ -17,3 +17,6 @@ export const authProviderConfig = {
         }
     }
 };
+
+// エクスポート
+export { firebaseConfig, authProviderConfig };
