@@ -703,6 +703,27 @@
             signOut: () => signOut(auth),
             onAuthStateChanged: (callback) => onAuthStateChanged(auth, callback)
         };
+
+        // グローバル関数として signIn と signOut を定義
+        window.signIn = async function() {
+            try {
+                const result = await window.firebaseAuth.signIn();
+                console.log('ログイン成功:', result.user);
+            } catch (error) {
+                console.error('ログインエラー:', error);
+                alert('ログインに失敗しました: ' + error.message);
+            }
+        };
+
+        window.signOut = async function() {
+            try {
+                await window.firebaseAuth.signOut();
+                console.log('ログアウト成功');
+            } catch (error) {
+                console.error('ログアウトエラー:', error);
+                alert('ログアウトに失敗しました: ' + error.message);
+            }
+        };
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.4.7/peerjs.min.js"></script>
     
@@ -774,26 +795,6 @@
                 }
             });
         });
-
-        async function signIn() {
-            try {
-                const result = await window.firebaseAuth.signIn();
-                console.log('ログイン成功:', result.user);
-            } catch (error) {
-                console.error('ログインエラー:', error);
-                alert('ログインに失敗しました: ' + error.message);
-            }
-        }
-
-        async function signOut() {
-            try {
-                await window.firebaseAuth.signOut();
-                console.log('ログアウト成功');
-            } catch (error) {
-                console.error('ログアウトエラー:', error);
-                alert('ログアウトに失敗しました: ' + error.message);
-            }
-        }
 
         function initializeP2P() {
             updateStatus('P2P接続を初期化中...', 'connecting');
