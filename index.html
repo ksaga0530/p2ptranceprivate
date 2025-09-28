@@ -6,6 +6,19 @@
     <title>P2TrancePrivate</title>
     
     <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#111827">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="P2TrancePrivate">
+    
+    <!-- iOS Safari用 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="P2TrancePrivate">
+    <link rel="apple-touch-icon" href="/icons/icon-192.png">
+    
+    <!-- その他のアイコン -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/icon-512.png">
     
     <style>
         * {
@@ -484,16 +497,19 @@
     <div class="main-content" id="mainContent">
         <div class="header">
             <h1>P2TrancePrivate</h1>
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div class="status disconnected" id="status">
-                    デバイス検索中...
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button id="installBtn" style="display: none; background: #10b981; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.375rem; font-size: 0.875rem; cursor: pointer;">
+                        アプリをインストール
+                    </button>
+                    <div class="status disconnected" id="status">
+                        デバイス検索中...
+                    </div>
+                    <div class="user-info" id="userInfo" style="display: none;">
+                        <img id="userAvatar" class="user-avatar" src="" alt="ユーザーアバター">
+                        <span id="userName" style="font-size: 0.875rem;"></span>
+                        <button class="logout-btn" onclick="handleSignOut()">ログアウト</button>
+                    </div>
                 </div>
-                <div class="user-info" id="userInfo" style="display: none;">
-                    <img id="userAvatar" class="user-avatar" src="" alt="ユーザーアバター">
-                    <span id="userName" style="font-size: 0.875rem;"></span>
-                    <button class="logout-btn" onclick="handleSignOut()">ログアウト</button>
-                </div>
-            </div>
         </div>
         
         <div class="message-area" id="messageHistory">
@@ -592,7 +608,8 @@
         let connections = new Map();
         let selectedFile = null;
         let onlineUsers = new Set();
-        let peerWatcher = null; 
+        let peerWatcher = null;
+        let deferredPrompt = null; // PWAインストールプロンプト
         
         // DOM要素の取得
         const statusEl = document.getElementById('status');
@@ -615,6 +632,30 @@
         const userInfo = document.getElementById('userInfo');
         const userName = document.getElementById('userName');
         const userAvatar = document.getElementById('userAvatar');
+        const installBtn = document.getElementById('installBtn');
+
+        // PWAインストールイベントの処理
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`ユーザーの選択: ${outcome}`);
+                deferredPrompt = null;
+                installBtn.style.display = 'none';
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            console.log('PWAがインストールされました');
+            installBtn.style.display = 'none';
+            deferredPrompt = null;
+        });
 
         window.handleSignIn = async function() {
             if (!window.firebaseAuth) {
