@@ -748,8 +748,8 @@
         const userName = document.getElementById('userName');
         const userAvatar = document.getElementById('userAvatar');
 
-        // Firebase認証の初期化を待つ
-        window.addEventListener('DOMContentLoaded', () => {
+        // Firebase認証の初期化とグローバル関数の定義
+        window.addEventListener('DOMContentLoaded', async () => {
             // 認証状態の監視
             window.firebaseAuth.onAuthStateChanged((user) => {
                 if (user) {
@@ -788,7 +788,8 @@
             });
         });
 
-        async function signIn() {
+        // グローバル関数として定義
+        window.signIn = async function() {
             try {
                 const result = await window.firebaseAuth.signIn();
                 console.log('ログイン成功:', result.user);
@@ -796,9 +797,9 @@
                 console.error('ログインエラー:', error);
                 alert('ログインに失敗しました: ' + error.message);
             }
-        }
+        };
 
-        async function signOut() {
+        window.signOut = async function() {
             try {
                 await window.firebaseAuth.signOut();
                 console.log('ログアウト成功');
@@ -806,7 +807,7 @@
                 console.error('ログアウトエラー:', error);
                 alert('ログアウトに失敗しました: ' + error.message);
             }
-        }
+        };
 
         function initializeP2P() {
             updateStatus('P2P接続を初期化中...', 'connecting');
