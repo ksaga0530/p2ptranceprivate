@@ -220,8 +220,224 @@
             font-family: inherit;
         }
         
-        /* ... (他のフォーム要素、メッセージ履歴などのスタイルは元のまま) ... */
-
+        /* Message Section */
+        .input-area {
+            position: relative;
+        }
+        
+        textarea {
+            height: 6rem;
+            resize: vertical;
+            padding-right: 5rem;
+        }
+        
+        .input-buttons {
+            position: absolute;
+            right: 0.5rem;
+            top: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        
+        .input-btn {
+            width: 2rem;
+            height: 2rem;
+            border-radius: 0.375rem;
+            border: 1px solid #d1d5db;
+            cursor: pointer;
+            font-size: 0.625rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .file-btn {
+            background: #16a34a;
+            color: white;
+            border-color: #16a34a;
+        }
+        
+        .paste-btn {
+            background: #0ea5e9;
+            color: white;
+            border-color: #0ea5e9;
+        }
+        
+        .input-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+        }
+        
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed #d1d5db;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--color-secondary);
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+        
+        .drop-zone.dragover {
+            border-color: var(--color-secondary);
+            background: #f9fafb;
+            color: var(--color-primary);
+        }
+        
+        /* File Preview */
+        .preview-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 0.75rem;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .file-details {
+            flex: 1;
+        }
+        
+        .file-icon {
+            width: 3rem;
+            height: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 0.625rem;
+            font-weight: 700;
+            color: var(--color-secondary);
+        }
+        
+        .image-preview {
+            max-width: 9rem;
+            max-height: 9rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+        
+        .file-info {
+            font-size: 0.75rem;
+            color: var(--color-secondary);
+            margin-top: 0.25rem;
+        }
+        
+        .clear-btn {
+            margin-top: 0.5rem;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+            background: var(--color-red);
+            color: var(--color-white);
+            border: none;
+            border-radius: 0.375rem;
+            cursor: pointer;
+        }
+        
+        /* Message History */
+        .message-history {
+            background: #f9fafb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            max-height: 18rem;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+        }
+        
+        .message {
+            margin: 0.75rem 0;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            max-width: 80%;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+        
+        .message.sent {
+            background: var(--color-primary);
+            color: var(--color-white);
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .message.received {
+            background: #e0f2fe;
+            color: #0277bd;
+            margin-right: auto;
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-top: 0.375rem;
+        }
+        
+        /* File Messages (省略) */
+        .file-message {
+            max-width: 18rem;
+        }
+        
+        .file-info-display {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin: 0.375rem 0;
+        }
+        
+        .file-download {
+            background: #2563eb;
+            color: var(--color-white);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            margin-top: 0.75rem;
+        }
+        
+        /* Image Overlay (省略) */
+        .image-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        
+        /* Loading (省略) */
+        .loading {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--color-secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
         /* フッター (新規追加/移動) */
         .footer {
             position: fixed;
@@ -274,7 +490,7 @@
         
         .footer .google-signin-btn-footer {
             background: #4285f4;
-            color: white;
+            color: var(--color-white);
             border: none;
             padding: 0.375rem 0.75rem;
             border-radius: 0.375rem;
@@ -316,7 +532,7 @@
 
     <div class="container main-content" id="mainContent">
         <div class="header" style="display: none;">
-            </div>
+        </div>
 
         <div class="main-grid">
             <div class="card">
@@ -359,10 +575,7 @@
                     <button onclick="sendMessage()" id="sendBtn" disabled>送信</button>
                     
                     <div class="message-history" id="messageHistory">
-                        <div style="text-align: center; color: #6b7280; font-style: italic;">
-                            他のデバイスとの接続を待機中...
                         </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -395,7 +608,6 @@
     </footer>
 
     <script type="module">
-        // ★ Realtime Databaseのインポート
         import { getFirebaseConfig } from './firebase-config.js';
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
@@ -438,7 +650,7 @@
             }
         };
         
-        // ★ PWA: サービスワーカーの登録 (index.htmlの外部に sw.js が必要です)
+        // PWA: サービスワーカーの登録 (index.htmlの外部に sw.js が必要です)
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
@@ -483,7 +695,7 @@
         const loginSection = document.getElementById('loginSection');
         const mainContent = document.getElementById('mainContent');
 
-        // ★ フッターの要素
+        // フッターの要素
         const footerUserInfo = document.getElementById('footerUserInfo');
         const footerUserName = document.getElementById('footerUserName');
         const footerUserAvatar = document.getElementById('footerUserAvatar');
@@ -674,7 +886,7 @@
             try {
                 const conn = peer.connect(userId, { reliable: true });
                 setupConnection(conn);
-                addSystemMessage(`デバイス ${userId} に接続を試行中...`);
+                // addSystemMessage(`デバイス ${userId} に接続を試行中...`); // ★ 削除
             } catch (err) {
                 console.log('Failed to connect to user:', userId);
             }
@@ -694,7 +906,7 @@
                     timestamp: new Date().toISOString()
                 });
                 
-                addSystemMessage(`${conn.peer} と接続しました`);
+                // addSystemMessage(`${conn.peer} と接続しました`); // ★ 削除
             });
             
             conn.on('data', (data) => {
@@ -706,7 +918,7 @@
                 connections.delete(conn.peer);
                 onlineUsers.delete(conn.peer);
                 updateConnectionStatus();
-                addSystemMessage(`${conn.peer} との接続が切断されました`);
+                // addSystemMessage(`${conn.peer} との接続が切断されました`); // ★ 削除
             });
             
             conn.on('error', (err) => {
@@ -843,6 +1055,8 @@
             messageHistory.scrollTop = messageHistory.scrollHeight;
         }
         
+        // ★ addSystemMessage関数は削除されました。
+        
         function addImageMessage(imageData, filename, filesize, type, timestamp, message = '', fromPeer = null) {
             const messageEl = document.createElement('div');
             messageEl.className = `message ${type} image-message`;
@@ -940,20 +1154,8 @@
             messageHistory.scrollTop = messageHistory.scrollHeight;
         }
         
-        function addSystemMessage(message) {
-            const messageEl = document.createElement('div');
-            messageEl.style.textAlign = 'center';
-            messageEl.style.color = '#6b7280';
-            messageEl.style.fontStyle = 'italic';
-            messageEl.style.margin = '0.75rem 0';
-            messageEl.style.fontSize = '0.875rem';
-            messageEl.textContent = message;
-            messageHistory.appendChild(messageEl);
-            messageHistory.scrollTop = messageHistory.scrollHeight;
-        }
-        
         function clearMessageHistory() {
-            messageHistory.innerHTML = '<div style="text-align: center; color: #6b7280; font-style: italic;">他のデバイスとの接続を待機中...</div>';
+            messageHistory.innerHTML = ''; // ★ 初期メッセージも削除し、完全に空にする
         }
         
         function selectFile() {
