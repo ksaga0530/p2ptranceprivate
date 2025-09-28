@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>P2TrancePrivate</title>
     <style>
+        /* ... (スタイルシートは省略) ... */
         * {
             margin: 0;
             padding: 0;
@@ -577,7 +578,6 @@
     </style>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="nav">
         <div class="nav-content">
             <h1>P2TrancePrivate</h1>
@@ -593,7 +593,6 @@
         </div>
     </nav>
 
-    <!-- Login Section -->
     <div class="login-section" id="loginSection">
         <div class="login-card">
             <h2>P2TrancePrivate</h2>
@@ -610,22 +609,17 @@
         </div>
     </div>
 
-    <!-- Main Content -->
     <div class="container main-content" id="mainContent">
-        <!-- Header Section -->
         <div class="header">
             <h2>セキュアP2Pファイル転送</h2>
             <p>ログイン済みユーザー間での暗号化通信によるファイル共有</p>
         </div>
 
-        <!-- Status -->
         <div class="status disconnected" id="status">
-            他のユーザーを検索中...
+            他のデバイスを検索中...
         </div>
 
-        <!-- Main Content -->
         <div class="main-grid">
-            <!-- Message & File Section -->
             <div class="card">
                 <div class="card-header">
                     <div>
@@ -667,7 +661,7 @@
                     
                     <div class="message-history" id="messageHistory">
                         <div style="text-align: center; color: #6b7280; font-style: italic;">
-                            他のユーザーとの接続を待機中...
+                            他のデバイスとの接続を待機中...
                         </div>
                     </div>
                 </div>
@@ -675,58 +669,69 @@
         </div>
     </div>
     
-    <!-- Image Overlay -->
     <div class="image-overlay" id="imageOverlay" onclick="closeImageOverlay()">
         <img id="overlayImg">
     </div>
 
-    <!-- Firebase SDK -->
     <script type="module">
-        // Firebase設定ファイルをインポート
+        // ★ Realtime Databaseのインポート
         import { getFirebaseConfig } from './firebase-config.js';
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
+        import { getDatabase, ref, set, onValue, remove, onDisconnect } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js';
 
         // Firebase初期化
         const firebaseConfig = getFirebaseConfig();
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getDatabase(app); 
         
         // Google認証プロバイダーの設定
         const provider = new GoogleAuthProvider();
-        // COOPエラーを回避するための設定
         provider.setCustomParameters({
             prompt: 'select_account'
         });
 
-        // グローバルスコープに関数を公開
+        // グローバルオブジェクトにFirebase認証ヘルパーをアタッチ
         window.firebaseAuth = {
             signIn: async () => {
                 try {
-                    // リダイレクト方式を試用（ポップアップの代替）
                     const result = await signInWithPopup(auth, provider);
                     return result;
                 } catch (error) {
                     console.warn('ポップアップログインに失敗、リダイレクト方式を試行:', error);
-                    // リダイレクト方式にフォールバック
                     const { signInWithRedirect } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js');
                     return signInWithRedirect(auth, provider);
                 }
             },
             signOut: () => signOut(auth),
-            onAuthStateChanged: (callback) => onAuthStateChanged(auth, callback)
+            onAuthStateChanged: (callback) => onAuthStateChanged(auth, callback),
+            // ★ Realtime Databaseのパス設定
+            db: {
+                // ユーザーIDのノードの下に、そのユーザーが現在オンラインのデバイスのPeer IDを登録する
+                getDeviceRef: (userId, peerId) => ref(db, `usersOnline/${userId}/${peerId}`),
+                // ユーザーIDのノード全体を監視して、他のデバイスのPeer IDを取得する
+                getDevicesRef: (userId) => ref(db, `usersOnline/${userId}`),
+                set,
+                remove,
+                onValue,
+                onDisconnect
+            }
         };
     </script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.4.7/peerjs.min.js"></script>
     
     <script>
-        // Firebase認証とグローバル関数の初期化
+        // グローバル変数の定義
         let currentUser = null;
         let peer = null;
         let connections = new Map();
         let selectedFile = null;
         let onlineUsers = new Set();
+        let peerWatcher = null; // データベース監視用のリスナーを格納
         
+        // ... (DOM要素の取得は省略) ...
         const statusEl = document.getElementById('status');
         const sendBtn = document.getElementById('sendBtn');
         const fileBtn = document.getElementById('fileBtn');
@@ -749,8 +754,14 @@
         const userName = document.getElementById('userName');
         const userAvatar = document.getElementById('userAvatar');
 
-        // グローバル関数として定義（HTMLから呼び出し可能）
+        /**
+         * モジュールスコープ外で定義されたグローバル関数
+         */
         window.handleSignIn = async function() {
+            if (!window.firebaseAuth) {
+                alert('Firebase認証モジュールがまだ読み込まれていません。しばらく待ってから再度お試しください。');
+                return;
+            }
             try {
                 const result = await window.firebaseAuth.signIn();
                 console.log('ログイン成功:', result.user);
@@ -761,6 +772,22 @@
         };
 
         window.handleSignOut = async function() {
+            if (!window.firebaseAuth) {
+                console.error('Firebase認証モジュールが未定義です。');
+                return;
+            }
+            // ★ ログアウト前にデータベースからPeer IDを削除
+            if (peer && currentUser) {
+                const db = window.firebaseAuth.db;
+                const deviceRef = db.getDeviceRef(currentUser.id, peer.id);
+                await db.remove(deviceRef);
+                
+                // ★ データベース監視を停止
+                const devicesRef = db.getDevicesRef(currentUser.id);
+                db.onValue(devicesRef, peerWatcher); // onValueを引数2つで呼ぶとリスナーが解除される
+                peerWatcher = null;
+            }
+            
             try {
                 await window.firebaseAuth.signOut();
                 console.log('ログアウト成功');
@@ -770,12 +797,16 @@
             }
         };
 
-        // Firebase認証の初期化とグローバル関数の定義
+        // Firebase認証の初期化と状態監視
         window.addEventListener('DOMContentLoaded', async () => {
-            // Firebase認証が準備されるまで少し待機
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            let attempts = 0;
+            const maxAttempts = 50; 
             
-            // 認証状態の監視
+            while (!window.firebaseAuth && attempts < maxAttempts) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+
             if (window.firebaseAuth) {
                 window.firebaseAuth.onAuthStateChanged((user) => {
                     if (user) {
@@ -812,10 +843,13 @@
                         clearMessageHistory();
                     }
                 });
+            } else {
+                console.error("Firebase認証モジュールの読み込みに失敗しました。");
+                updateStatus('致命的なエラー: 認証機能が利用できません', 'disconnected');
             }
         });
 
-        function initializeP2P() {
+        async function initializeP2P() {
             updateStatus('P2P接続を初期化中...', 'connecting');
             
             const peerOptions = {
@@ -828,16 +862,32 @@
                 }
             };
             
-            // Googleアカウントのユニークな部分を使用してPeer IDを生成
-            const peerId = 'user-' + currentUser.id.substring(0, 12);
+            // Peer IDをデバイス固有にすることで、同じアカウントで複数の接続を可能にする
+            // Math.random()を追加して、複数のブラウザタブやデバイスで重複を防ぐ
+            const deviceSuffix = Math.random().toString(36).substring(2, 8);
+            const peerId = 'user-' + currentUser.id.substring(0, 12) + '-' + deviceSuffix;
             peer = new Peer(peerId, peerOptions);
             
-            peer.on('open', (id) => {
+            peer.on('open', async (id) => {
                 console.log('My peer ID is: ' + id);
-                updateStatus('他のユーザーを検索中...', 'connecting');
                 
-                // 他のユーザーへの自動接続を試行
-                discoverAndConnectUsers();
+                // ★ 修正点: Peer IDを Realtime Database に登録（自分のユーザー ID の下に）
+                const db = window.firebaseAuth.db;
+                const deviceRef = db.getDeviceRef(currentUser.id, id);
+                
+                // IDを登録し、切断時に自動削除されるように設定
+                await db.set(deviceRef, {
+                    peerId: id,
+                    name: navigator.userAgent.substring(0, 30), // デバイス識別のヒント
+                    timestamp: Date.now()
+                });
+                // ブラウザが予期せず閉じられた場合に備え、切断時の削除を設定
+                db.onDisconnect(deviceRef).remove();
+
+                updateStatus('他のデバイスを検索中...', 'connecting');
+                
+                // ★ 修正点: 自分のデバイスを監視して接続を確立
+                startPeerDiscovery(id);
                 
                 messageInput.disabled = false;
                 fileBtn.disabled = false;
@@ -853,35 +903,32 @@
                 updateStatus('エラーが発生しました: ' + err.message, 'disconnected');
             });
         }
+        
+        // ★ 修正点: 自分のアカウントのデバイスのみをディスカバリ
+        function startPeerDiscovery(myPeerId) {
+            const db = window.firebaseAuth.db;
+            const devicesRef = db.getDevicesRef(currentUser.id);
+            
+            // 自分のユーザーIDのノードにあるデバイスリストを監視
+            peerWatcher = db.onValue(devicesRef, (snapshot) => {
+                const devices = snapshot.val();
+                if (!devices) return;
 
-        function discoverAndConnectUsers() {
-            // 実際のアプリケーションでは、ここでサーバーから他のオンラインユーザーのリストを取得し、
-            // 自動的に接続を試行します。この例では、デモ用の仮想ユーザーIDを使用します。
-            
-            // デモ用: 複数の仮想ユーザーIDに接続を試行
-            const demoUserIds = ['user-demo1', 'user-demo2', 'user-demo3'];
-            
-            demoUserIds.forEach(userId => {
-                if (userId !== peer.id) {
-                    setTimeout(() => {
-                        tryConnectToUser(userId);
-                    }, Math.random() * 2000);
-                }
+                // 自分のデバイス一覧をループして接続を試行
+                Object.keys(devices).forEach(peerId => {
+                    // 自分自身、または既に接続済みのピアを除外
+                    if (peerId !== myPeerId && !connections.has(peerId)) {
+                        tryConnectToUser(peerId);
+                    }
+                });
             });
-            
-            // 接続が確立されなかった場合のタイムアウト
-            setTimeout(() => {
-                if (connections.size === 0) {
-                    updateStatus('他のユーザーが見つかりません - 待機中', 'connecting');
-                    addSystemMessage('他のユーザーの接続を待っています...');
-                }
-            }, 5000);
         }
-
+        
         function tryConnectToUser(userId) {
             try {
-                const conn = peer.connect(userId);
+                const conn = peer.connect(userId, { reliable: true });
                 setupConnection(conn);
+                addSystemMessage(`デバイス ${userId} に接続を試行中...`);
             } catch (err) {
                 console.log('Failed to connect to user:', userId);
             }
@@ -927,19 +974,18 @@
         function updateConnectionStatus() {
             const connectedCount = connections.size;
             if (connectedCount > 0) {
-                updateStatus(`${connectedCount}人のユーザーと接続済み`, 'connected');
+                updateStatus(`${connectedCount}人のデバイスと接続済み`, 'connected');
                 sendBtn.disabled = false;
             } else {
-                updateStatus('他のユーザーを検索中...', 'connecting');
+                updateStatus('他のデバイスを検索中...', 'connecting');
                 sendBtn.disabled = true;
             }
         }
-
+        
         function handleReceivedData(data, fromPeer) {
             const timestamp = new Date().toLocaleTimeString();
             
             if (data.type === 'user_info') {
-                // ユーザー情報を受信
                 console.log('User info received from:', fromPeer, data.user);
                 return;
             }
@@ -952,7 +998,7 @@
                 addFileMessage(data.fileData, data.filename, data.filesize, data.filetype, 'received', data.timestamp || timestamp, data.message, fromPeer);
             }
         }
-
+        
         function broadcastToAllConnections(data) {
             connections.forEach((conn, peerId) => {
                 if (conn.open) {
@@ -1011,7 +1057,7 @@
                 messageInput.value = '';
             }
         }
-
+        
         function updateStatus(message, type) {
             statusEl.textContent = message;
             statusEl.className = `status ${type}`;
@@ -1161,7 +1207,7 @@
         }
         
         function clearMessageHistory() {
-            messageHistory.innerHTML = '<div style="text-align: center; color: #6b7280; font-style: italic;">他のユーザーとの接続を待機中...</div>';
+            messageHistory.innerHTML = '<div style="text-align: center; color: #6b7280; font-style: italic;">他のデバイスとの接続を待機中...</div>';
         }
         
         function selectFile() {
@@ -1208,7 +1254,6 @@
         function getFileIcon(mimeType) {
             if (mimeType.startsWith('image/')) return 'IMG';
             if (mimeType.startsWith('video/')) return 'VID';
-            if (mimeType.startsWith('audio/')) return 'AUD';
             if (mimeType.includes('pdf')) return 'PDF';
             if (mimeType.includes('word')) return 'DOC';
             if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return 'XLS';
@@ -1329,6 +1374,16 @@
         window.addEventListener('beforeunload', () => {
             connections.forEach(conn => conn.close());
             if (peer) {
+                // Realtime Database から ID を削除（onDisconnect が効かない場合も考慮）
+                if (currentUser) {
+                    const db = window.firebaseAuth.db;
+                    const deviceRef = db.getDeviceRef(currentUser.id, peer.id);
+                    db.remove(deviceRef);
+                }
                 peer.destroy();
             }
         });
+
+</script>
+</body>
+</html>
