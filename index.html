@@ -691,11 +691,28 @@
         const firebaseConfig = getFirebaseConfig();
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        
+        // Google認証プロバイダーの設定
         const provider = new GoogleAuthProvider();
+        // COOPエラーを回避するための設定
+        provider.setCustomParameters({
+            prompt: 'select_account'
+        });
 
         // グローバルスコープに関数を公開
         window.firebaseAuth = {
-            signIn: () => signInWithPopup(auth, provider),
+            signIn: async () => {
+                try {
+                    // リダイレクト方式を試用（ポップアップの代替）
+                    const result = await signInWithPopup(auth, provider);
+                    return result;
+                } catch (error) {
+                    console.warn('ポップアップログインに失敗、リダイレクト方式を試行:', error);
+                    // リダイレクト方式にフォールバック
+                    const { signInWithRedirect } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js');
+                    return signInWithRedirect(auth, provider);
+                }
+            },
             signOut: () => signOut(auth),
             onAuthStateChanged: (callback) => onAuthStateChanged(auth, callback)
         };
