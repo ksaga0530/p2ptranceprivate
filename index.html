@@ -4,20 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>P2TrancePrivate</title>
-    
-    <link rel="manifest" href="/manifest.json">
-    
     <style>
-        :root {
-            --color-primary: #111827;
-            --color-secondary: #6b7280;
-            --color-background: #f9fafb;
-            --color-white: white;
-            --color-red: #dc2626;
-            --color-green: #10b981;
-            --color-yellow: #d97706;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -26,13 +13,12 @@
         
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
-            background: var(--color-background);
+            background: #f9fafb;
             min-height: 100vh;
-            color: var(--color-primary);
-            padding-bottom: 70px; /* フッターの高さ分を確保 */
+            color: #111827;
         }
         
-        /* Navigation (タイトルのみ残す) */
+        /* Navigation */
         .nav {
             border-bottom: 1px solid #e5e7eb;
             background: rgba(255, 255, 255, 0.8);
@@ -48,23 +34,66 @@
             padding: 1rem 2rem;
             display: flex;
             align-items: center;
-            justify-content: flex-start; /* 左寄せに変更 */
+            justify-content: space-between;
         }
         
         .nav h1 {
             font-size: 1.5rem;
             font-weight: 300;
             letter-spacing: -0.025em;
-            color: var(--color-primary);
+            color: #111827;
         }
         
-        /* 以前の.nav-statusはフッターに移動 */
+        .nav-status {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            font-size: 0.875rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 2px solid #e5e7eb;
+        }
+        
+        .logout-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .logout-btn:hover {
+            background: #b91c1c;
+        }
+        
+        .status-text {
+            color: #6b7280;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #10b981;
+        }
         
         .container {
             max-width: 1280px;
             margin: 0 auto;
-            padding: 2rem 2rem; /* ヘッダー削除に伴い上部のパディングを調整 */
-            padding-top: 0rem;
+            padding: 3rem 2rem;
         }
         
         /* Login Section */
@@ -73,16 +102,16 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: calc(100vh - 70px - 70px); /* 画面全体からナビとフッターを引いた高さ */
-            text-align: center;
+            min-height: 70vh;
         }
         
         .login-card {
-            background: var(--color-white);
+            background: white;
             border-radius: 1rem;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
             border: 1px solid #e5e7eb;
             padding: 3rem;
+            text-align: center;
             max-width: 400px;
             width: 100%;
         }
@@ -90,14 +119,14 @@
         .login-card h2 {
             font-size: 2rem;
             font-weight: 300;
-            color: var(--color-primary);
+            color: #111827;
             margin-bottom: 1rem;
             letter-spacing: -0.025em;
         }
         
         .login-card p {
             font-size: 1rem;
-            color: var(--color-secondary);
+            color: #6b7280;
             font-weight: 300;
             margin-bottom: 2rem;
             line-height: 1.6;
@@ -111,7 +140,7 @@
             width: 100%;
             padding: 0.75rem 1.5rem;
             background: #4285f4;
-            color: var(--color-white);
+            color: white;
             border: none;
             border-radius: 0.75rem;
             font-size: 1rem;
@@ -126,44 +155,60 @@
             box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
         }
         
-        /* Main Content */
+        /* Main Content (hidden until logged in) */
         .main-content {
             display: none;
         }
         
-        /* Header Section (非表示) */
+        /* Header */
         .header {
-            display: none;
+            text-align: center;
+            margin-bottom: 4rem;
         }
         
-        /* Status (フッターに移動) */
-        .status-footer {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            font-size: 0.875rem;
+        .header h2 {
+            font-size: 3rem;
+            font-weight: 200;
+            color: #111827;
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
         }
-
-        .status-footer .status {
-            padding: 0.375rem 0.75rem;
-            margin: 0;
+        
+        .header p {
+            font-size: 1.25rem;
+            color: #6b7280;
+            font-weight: 300;
+            max-width: 32rem;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        /* Status */
+        .status {
+            text-align: center;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
         }
         
         .status.disconnected {
             background: #fef2f2;
-            color: var(--color-red);
+            color: #dc2626;
             border: 1px solid #fecaca;
         }
         
         .status.connecting {
             background: #fffbeb;
-            color: var(--color-yellow);
+            color: #d97706;
             border: 1px solid #fed7aa;
         }
         
         .status.connected {
             background: #f0fdf4;
-            color: var(--color-green);
+            color: #16a34a;
             border: 1px solid #bbf7d0;
         }
         
@@ -172,16 +217,20 @@
             display: grid;
             grid-template-columns: 1fr;
             gap: 3rem;
-            margin-bottom: 0rem; 
+            margin-bottom: 3rem;
         }
         
         .card {
-            background: var(--color-white);
+            background: white;
             border-radius: 1rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             border: 1px solid #e5e7eb;
             overflow: hidden;
             transition: all 0.5s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
         
         .card-header {
@@ -195,12 +244,12 @@
         .card-title {
             font-size: 1.125rem;
             font-weight: 500;
-            color: var(--color-primary);
+            color: #111827;
             letter-spacing: -0.025em;
         }
         
         .card-subtitle {
-            color: var(--color-secondary);
+            color: #6b7280;
             font-size: 0.875rem;
             margin-top: 0.25rem;
         }
@@ -209,7 +258,7 @@
             padding: 2rem;
         }
         
-        /* Form Elements (省略) */
+        /* Form Elements */
         input, button, textarea {
             width: 100%;
             padding: 0.75rem;
@@ -218,6 +267,35 @@
             font-size: 1rem;
             transition: all 0.3s ease;
             font-family: inherit;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #6b7280;
+            box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.1);
+        }
+        
+        button {
+            background: #111827;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            margin-top: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover:not(:disabled) {
+            background: #1f2937;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
         
         /* Message Section */
@@ -278,16 +356,16 @@
             border-radius: 0.75rem;
             padding: 1.5rem;
             text-align: center;
-            color: var(--color-secondary);
+            color: #6b7280;
             margin: 1rem 0;
             transition: all 0.3s ease;
             font-size: 0.875rem;
         }
         
         .drop-zone.dragover {
-            border-color: var(--color-secondary);
+            border-color: #6b7280;
             background: #f9fafb;
-            color: var(--color-primary);
+            color: #111827;
         }
         
         /* File Preview */
@@ -317,7 +395,7 @@
             border-radius: 0.5rem;
             font-size: 0.625rem;
             font-weight: 700;
-            color: var(--color-secondary);
+            color: #6b7280;
         }
         
         .image-preview {
@@ -329,7 +407,7 @@
         
         .file-info {
             font-size: 0.75rem;
-            color: var(--color-secondary);
+            color: #6b7280;
             margin-top: 0.25rem;
         }
         
@@ -337,8 +415,8 @@
             margin-top: 0.5rem;
             padding: 0.375rem 0.75rem;
             font-size: 0.75rem;
-            background: var(--color-red);
-            color: var(--color-white);
+            background: #dc2626;
+            color: white;
             border: none;
             border-radius: 0.375rem;
             cursor: pointer;
@@ -365,8 +443,8 @@
         }
         
         .message.sent {
-            background: var(--color-primary);
-            color: var(--color-white);
+            background: #111827;
+            color: white;
             margin-left: auto;
             text-align: right;
         }
@@ -383,7 +461,7 @@
             margin-top: 0.375rem;
         }
         
-        /* File Messages (省略) */
+        /* File Messages */
         .file-message {
             max-width: 18rem;
         }
@@ -398,7 +476,7 @@
         
         .file-download {
             background: #2563eb;
-            color: var(--color-white);
+            color: white;
             border: none;
             padding: 0.5rem 1rem;
             border-radius: 0.375rem;
@@ -407,7 +485,11 @@
             margin-top: 0.75rem;
         }
         
-        /* Image Overlay (省略) */
+        .file-download:hover {
+            background: #1d4ed8;
+        }
+        
+        /* Image Overlay */
         .image-overlay {
             position: fixed;
             top: 0;
@@ -422,13 +504,19 @@
             cursor: pointer;
         }
         
-        /* Loading (省略) */
+        .image-overlay img {
+            max-width: 90%;
+            max-height: 90%;
+            border-radius: 0.75rem;
+        }
+        
+        /* Loading */
         .loading {
             display: inline-block;
             width: 1rem;
             height: 1rem;
             border: 2px solid #f3f3f3;
-            border-top: 2px solid var(--color-secondary);
+            border-top: 2px solid #6b7280;
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -438,82 +526,74 @@
             100% { transform: rotate(360deg); }
         }
         
-        /* フッター (新規追加/移動) */
-        .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            border-top: 1px solid #e5e7eb;
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            z-index: 50;
-        }
-        
-        .footer-content {
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 0.75rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .footer .user-info {
-            display: none; /* 初期は非表示 */
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .footer .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: 2px solid #e5e7eb;
-        }
-        
-        .footer .logout-btn {
-            background: var(--color-red);
-            color: var(--color-white);
-            border: none;
-            padding: 0.375rem 0.75rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        /* Login時のフッターに配置するボタン */
-        .footer .login-btn-container {
-            display: none;
-        }
-        
-        .footer .google-signin-btn-footer {
-            background: #4285f4;
-            color: var(--color-white);
-            border: none;
-            padding: 0.375rem 0.75rem;
-            border-radius: 0.375rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-            cursor: pointer;
-        }
-
-        @media (max-width: 768px) {
-            .footer-content {
-                padding: 0.5rem 1rem;
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 2rem 1rem;
+            }
+            
+            .nav-content {
+                padding: 1rem;
             }
         }
-        /* ... (その他のメディアクエリは省略) ... */
+        
+        @media (max-width: 768px) {
+            .header h2 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .card-header, .card-content {
+                padding: 1.5rem;
+            }
+            
+            textarea {
+                height: 5rem;
+                font-size: 16px;
+            }
+            
+            .input-buttons {
+                right: 0.375rem;
+                top: 0.375rem;
+            }
+            
+            .input-btn {
+                width: 1.75rem;
+                height: 1.75rem;
+                font-size: 0.5rem;
+            }
+            
+            input, button, textarea {
+                font-size: 16px;
+            }
+        }
+        
+        #fileInput {
+            display: none;
+        }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="nav">
         <div class="nav-content">
             <h1>P2TrancePrivate</h1>
+            <div class="nav-status">
+                <div class="user-info" id="userInfo" style="display: none;">
+                    <img id="userAvatar" class="user-avatar" src="" alt="ユーザーアバター">
+                    <span id="userName"></span>
+                    <button class="logout-btn" onclick="handleSignOut()">ログアウト</button>
+                </div>
+                <span class="status-text">WebRTCによるセキュア通信</span>
+                <div class="status-indicator"></div>
+            </div>
         </div>
     </nav>
 
+    <!-- Login Section -->
     <div class="login-section" id="loginSection">
         <div class="login-card">
             <h2>P2TrancePrivate</h2>
@@ -530,11 +610,22 @@
         </div>
     </div>
 
+    <!-- Main Content -->
     <div class="container main-content" id="mainContent">
-        <div class="header" style="display: none;">
+        <!-- Header Section -->
+        <div class="header">
+            <h2>セキュアP2Pファイル転送</h2>
+            <p>ログイン済みユーザー間での暗号化通信によるファイル共有</p>
         </div>
 
+        <!-- Status -->
+        <div class="status disconnected" id="status">
+            他のユーザーを検索中...
+        </div>
+
+        <!-- Main Content -->
         <div class="main-grid">
+            <!-- Message & File Section -->
             <div class="card">
                 <div class="card-header">
                     <div>
@@ -575,107 +666,67 @@
                     <button onclick="sendMessage()" id="sendBtn" disabled>送信</button>
                     
                     <div class="message-history" id="messageHistory">
+                        <div style="text-align: center; color: #6b7280; font-style: italic;">
+                            他のユーザーとの接続を待機中...
                         </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
     
+    <!-- Image Overlay -->
     <div class="image-overlay" id="imageOverlay" onclick="closeImageOverlay()">
         <img id="overlayImg">
     </div>
-    
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="status-footer">
-                <div class="status disconnected" id="status">
-                    デバイス検索中...
-                </div>
-            </div>
-            
-            <div class="user-info" id="footerUserInfo">
-                <img id="footerUserAvatar" class="user-avatar" src="" alt="ユーザーアバター">
-                <span id="footerUserName" style="font-size: 0.875rem;"></span>
-                <button class="logout-btn" onclick="handleSignOut()">ログアウト</button>
-            </div>
-            
-            <div class="login-btn-container" id="footerLoginBtnContainer">
-                <button class="google-signin-btn-footer" onclick="handleSignIn()">
-                    Googleでログイン
-                </button>
-            </div>
-        </div>
-    </footer>
 
+    <!-- Firebase SDK -->
     <script type="module">
+        // Firebase設定ファイルをインポート
         import { getFirebaseConfig } from './firebase-config.js';
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js';
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js';
-        import { getDatabase, ref, set, onValue, remove, onDisconnect } from 'https://www.gstatic.com/firebasejs/9.22.1/firebase-database.js';
 
         // Firebase初期化
         const firebaseConfig = getFirebaseConfig();
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-        const db = getDatabase(app); 
         
         // Google認証プロバイダーの設定
         const provider = new GoogleAuthProvider();
+        // COOPエラーを回避するための設定
         provider.setCustomParameters({
             prompt: 'select_account'
         });
 
-        // グローバルオブジェクトにFirebase認証ヘルパーをアタッチ
+        // グローバルスコープに関数を公開
         window.firebaseAuth = {
             signIn: async () => {
                 try {
+                    // リダイレクト方式を試用（ポップアップの代替）
                     const result = await signInWithPopup(auth, provider);
                     return result;
                 } catch (error) {
                     console.warn('ポップアップログインに失敗、リダイレクト方式を試行:', error);
+                    // リダイレクト方式にフォールバック
                     const { signInWithRedirect } = await import('https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js');
                     return signInWithRedirect(auth, provider);
                 }
             },
             signOut: () => signOut(auth),
-            onAuthStateChanged: (callback) => onAuthStateChanged(auth, callback),
-            // Realtime Databaseのパス設定
-            db: {
-                getDeviceRef: (userId, peerId) => ref(db, `usersOnline/${userId}/${peerId}`),
-                getDevicesRef: (userId) => ref(db, `usersOnline/${userId}`),
-                set,
-                remove,
-                onValue,
-                onDisconnect
-            }
+            onAuthStateChanged: (callback) => onAuthStateChanged(auth, callback)
         };
-        
-        // PWA: サービスワーカーの登録 (index.htmlの外部に sw.js が必要です)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(registration => {
-                        console.log('SW registered: ', registration);
-                    })
-                    .catch(registrationError => {
-                        console.log('SW registration failed: ', registrationError);
-                    });
-            });
-        }
     </script>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.4.7/peerjs.min.js"></script>
     
     <script>
-        // グローバル変数の定義
+        // Firebase認証とグローバル関数の初期化
         let currentUser = null;
         let peer = null;
         let connections = new Map();
         let selectedFile = null;
         let onlineUsers = new Set();
-        let peerWatcher = null; 
         
-        // DOM要素の取得
         const statusEl = document.getElementById('status');
         const sendBtn = document.getElementById('sendBtn');
         const fileBtn = document.getElementById('fileBtn');
@@ -694,21 +745,12 @@
         const overlayImg = document.getElementById('overlayImg');
         const loginSection = document.getElementById('loginSection');
         const mainContent = document.getElementById('mainContent');
+        const userInfo = document.getElementById('userInfo');
+        const userName = document.getElementById('userName');
+        const userAvatar = document.getElementById('userAvatar');
 
-        // フッターの要素
-        const footerUserInfo = document.getElementById('footerUserInfo');
-        const footerUserName = document.getElementById('footerUserName');
-        const footerUserAvatar = document.getElementById('footerUserAvatar');
-        const footerLoginBtnContainer = document.getElementById('footerLoginBtnContainer');
-
-        /**
-         * モジュールスコープ外で定義されたグローバル関数
-         */
+        // グローバル関数として定義（HTMLから呼び出し可能）
         window.handleSignIn = async function() {
-            if (!window.firebaseAuth) {
-                alert('Firebase認証モジュールがまだ読み込まれていません。しばらく待ってから再度お試しください。');
-                return;
-            }
             try {
                 const result = await window.firebaseAuth.signIn();
                 console.log('ログイン成功:', result.user);
@@ -719,25 +761,6 @@
         };
 
         window.handleSignOut = async function() {
-            if (!window.firebaseAuth) {
-                console.error('Firebase認証モジュールが未定義です。');
-                return;
-            }
-            // ログアウト前にデータベースからPeer IDを削除
-            if (peer && currentUser) {
-                const db = window.firebaseAuth.db;
-                const devicesRef = db.getDevicesRef(currentUser.id);
-                const deviceRef = db.getDeviceRef(currentUser.id, peer.id);
-                
-                // データベース監視を停止
-                if (peerWatcher) {
-                    db.onValue(devicesRef, peerWatcher); 
-                    peerWatcher = null;
-                }
-                
-                await db.remove(deviceRef);
-            }
-            
             try {
                 await window.firebaseAuth.signOut();
                 console.log('ログアウト成功');
@@ -747,48 +770,12 @@
             }
         };
 
-        // UIの状態を更新するヘルパー関数
-        function updateUI(user) {
-            if (user) {
-                // ログイン状態
-                loginSection.style.display = 'none';
-                mainContent.style.display = 'block';
-                footerUserInfo.style.display = 'flex';
-                footerLoginBtnContainer.style.display = 'none';
-
-                footerUserName.textContent = user.name;
-                footerUserAvatar.src = user.picture;
-
-                // P2P接続を開始
-                initializeP2P();
-            } else {
-                // ログアウト状態
-                loginSection.style.display = 'flex';
-                mainContent.style.display = 'none';
-                footerUserInfo.style.display = 'none';
-                footerLoginBtnContainer.style.display = 'block';
-
-                // 接続をクリーンアップ
-                if (peer) {
-                    peer.destroy();
-                    peer = null;
-                }
-                connections.clear();
-                onlineUsers.clear();
-                clearMessageHistory();
-            }
-        }
-
-        // Firebase認証の初期化と状態監視
+        // Firebase認証の初期化とグローバル関数の定義
         window.addEventListener('DOMContentLoaded', async () => {
-            let attempts = 0;
-            const maxAttempts = 50; 
+            // Firebase認証が準備されるまで少し待機
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
-            while (!window.firebaseAuth && attempts < maxAttempts) {
-                await new Promise(resolve => setTimeout(resolve, 100));
-                attempts++;
-            }
-
+            // 認証状態の監視
             if (window.firebaseAuth) {
                 window.firebaseAuth.onAuthStateChanged((user) => {
                     if (user) {
@@ -798,18 +785,37 @@
                             email: user.email,
                             picture: user.photoURL
                         };
+                        
+                        // UIを更新
+                        loginSection.style.display = 'none';
+                        mainContent.style.display = 'block';
+                        userInfo.style.display = 'flex';
+                        userName.textContent = currentUser.name;
+                        userAvatar.src = currentUser.picture;
+                        
+                        // P2P接続を開始
+                        initializeP2P();
                     } else {
+                        // ログアウト状態
                         currentUser = null;
+                        loginSection.style.display = 'flex';
+                        mainContent.style.display = 'none';
+                        userInfo.style.display = 'none';
+                        
+                        // 接続をクリーンアップ
+                        if (peer) {
+                            peer.destroy();
+                            peer = null;
+                        }
+                        connections.clear();
+                        onlineUsers.clear();
+                        clearMessageHistory();
                     }
-                    updateUI(currentUser);
                 });
-            } else {
-                console.error("Firebase認証モジュールの読み込みに失敗しました。");
-                updateStatus('致命的なエラー: 認証機能が利用できません', 'disconnected');
             }
         });
 
-        async function initializeP2P() {
+        function initializeP2P() {
             updateStatus('P2P接続を初期化中...', 'connecting');
             
             const peerOptions = {
@@ -822,30 +828,16 @@
                 }
             };
             
-            // Peer IDをデバイス固有にすることで、同じアカウントで複数の接続を可能にする
-            const deviceSuffix = Math.random().toString(36).substring(2, 8);
-            const peerId = 'user-' + currentUser.id.substring(0, 12) + '-' + deviceSuffix;
+            // Googleアカウントのユニークな部分を使用してPeer IDを生成
+            const peerId = 'user-' + currentUser.id.substring(0, 12);
             peer = new Peer(peerId, peerOptions);
             
-            peer.on('open', async (id) => {
+            peer.on('open', (id) => {
                 console.log('My peer ID is: ' + id);
+                updateStatus('他のユーザーを検索中...', 'connecting');
                 
-                // Peer IDを Realtime Database に登録
-                const db = window.firebaseAuth.db;
-                const deviceRef = db.getDeviceRef(currentUser.id, id);
-                
-                await db.set(deviceRef, {
-                    peerId: id,
-                    name: navigator.userAgent.substring(0, 30), 
-                    timestamp: Date.now()
-                });
-                // 切断時の削除を設定
-                db.onDisconnect(deviceRef).remove();
-
-                updateStatus('他のデバイスを検索中...', 'connecting');
-                
-                // 自分のデバイスを監視して接続を確立
-                startPeerDiscovery(id);
+                // 他のユーザーへの自動接続を試行
+                discoverAndConnectUsers();
                 
                 messageInput.disabled = false;
                 fileBtn.disabled = false;
@@ -861,32 +853,35 @@
                 updateStatus('エラーが発生しました: ' + err.message, 'disconnected');
             });
         }
-        
-        // 自分のアカウントのデバイスのみをディスカバリ
-        function startPeerDiscovery(myPeerId) {
-            const db = window.firebaseAuth.db;
-            const devicesRef = db.getDevicesRef(currentUser.id);
-            
-            // 自分のユーザーIDのノードにあるデバイスリストを監視
-            peerWatcher = db.onValue(devicesRef, (snapshot) => {
-                const devices = snapshot.val();
-                if (!devices) return;
 
-                // 自分のデバイス一覧をループして接続を試行
-                Object.keys(devices).forEach(peerId => {
-                    // 自分自身、または既に接続済みのピアを除外
-                    if (peerId !== myPeerId && !connections.has(peerId)) {
-                        tryConnectToUser(peerId);
-                    }
-                });
+        function discoverAndConnectUsers() {
+            // 実際のアプリケーションでは、ここでサーバーから他のオンラインユーザーのリストを取得し、
+            // 自動的に接続を試行します。この例では、デモ用の仮想ユーザーIDを使用します。
+            
+            // デモ用: 複数の仮想ユーザーIDに接続を試行
+            const demoUserIds = ['user-demo1', 'user-demo2', 'user-demo3'];
+            
+            demoUserIds.forEach(userId => {
+                if (userId !== peer.id) {
+                    setTimeout(() => {
+                        tryConnectToUser(userId);
+                    }, Math.random() * 2000);
+                }
             });
+            
+            // 接続が確立されなかった場合のタイムアウト
+            setTimeout(() => {
+                if (connections.size === 0) {
+                    updateStatus('他のユーザーが見つかりません - 待機中', 'connecting');
+                    addSystemMessage('他のユーザーの接続を待っています...');
+                }
+            }, 5000);
         }
-        
+
         function tryConnectToUser(userId) {
             try {
-                const conn = peer.connect(userId, { reliable: true });
+                const conn = peer.connect(userId);
                 setupConnection(conn);
-                // addSystemMessage(`デバイス ${userId} に接続を試行中...`); // ★ 削除
             } catch (err) {
                 console.log('Failed to connect to user:', userId);
             }
@@ -906,7 +901,7 @@
                     timestamp: new Date().toISOString()
                 });
                 
-                // addSystemMessage(`${conn.peer} と接続しました`); // ★ 削除
+                addSystemMessage(`${conn.peer} と接続しました`);
             });
             
             conn.on('data', (data) => {
@@ -918,7 +913,7 @@
                 connections.delete(conn.peer);
                 onlineUsers.delete(conn.peer);
                 updateConnectionStatus();
-                // addSystemMessage(`${conn.peer} との接続が切断されました`); // ★ 削除
+                addSystemMessage(`${conn.peer} との接続が切断されました`);
             });
             
             conn.on('error', (err) => {
@@ -932,18 +927,19 @@
         function updateConnectionStatus() {
             const connectedCount = connections.size;
             if (connectedCount > 0) {
-                updateStatus(`${connectedCount}人のデバイスと接続済み`, 'connected');
+                updateStatus(`${connectedCount}人のユーザーと接続済み`, 'connected');
                 sendBtn.disabled = false;
             } else {
-                updateStatus('他のデバイスを検索中...', 'connecting');
+                updateStatus('他のユーザーを検索中...', 'connecting');
                 sendBtn.disabled = true;
             }
         }
-        
+
         function handleReceivedData(data, fromPeer) {
             const timestamp = new Date().toLocaleTimeString();
             
             if (data.type === 'user_info') {
+                // ユーザー情報を受信
                 console.log('User info received from:', fromPeer, data.user);
                 return;
             }
@@ -956,7 +952,7 @@
                 addFileMessage(data.fileData, data.filename, data.filesize, data.filetype, 'received', data.timestamp || timestamp, data.message, fromPeer);
             }
         }
-        
+
         function broadcastToAllConnections(data) {
             connections.forEach((conn, peerId) => {
                 if (conn.open) {
@@ -1015,7 +1011,7 @@
                 messageInput.value = '';
             }
         }
-        
+
         function updateStatus(message, type) {
             statusEl.textContent = message;
             statusEl.className = `status ${type}`;
@@ -1054,8 +1050,6 @@
             messageHistory.appendChild(messageEl);
             messageHistory.scrollTop = messageHistory.scrollHeight;
         }
-        
-        // ★ addSystemMessage関数は削除されました。
         
         function addImageMessage(imageData, filename, filesize, type, timestamp, message = '', fromPeer = null) {
             const messageEl = document.createElement('div');
@@ -1154,8 +1148,20 @@
             messageHistory.scrollTop = messageHistory.scrollHeight;
         }
         
+        function addSystemMessage(message) {
+            const messageEl = document.createElement('div');
+            messageEl.style.textAlign = 'center';
+            messageEl.style.color = '#6b7280';
+            messageEl.style.fontStyle = 'italic';
+            messageEl.style.margin = '0.75rem 0';
+            messageEl.style.fontSize = '0.875rem';
+            messageEl.textContent = message;
+            messageHistory.appendChild(messageEl);
+            messageHistory.scrollTop = messageHistory.scrollHeight;
+        }
+        
         function clearMessageHistory() {
-            messageHistory.innerHTML = ''; // ★ 初期メッセージも削除し、完全に空にする
+            messageHistory.innerHTML = '<div style="text-align: center; color: #6b7280; font-style: italic;">他のユーザーとの接続を待機中...</div>';
         }
         
         function selectFile() {
@@ -1176,32 +1182,37 @@
             if (isImage) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    previewImg.src = e.target.result;
-                    previewImg.style.display = 'block';
-                    fileIcon.style.display = 'none';
+                    fileIcon.style.backgroundImage = `url(${e.target.result})`;
+                    fileIcon.style.backgroundSize = 'cover';
+                    fileIcon.style.backgroundPosition = 'center';
+                    fileIcon.textContent = '';
                 };
                 reader.readAsDataURL(file);
             } else {
-                previewImg.style.display = 'none';
-                fileIcon.style.display = 'flex';
+                fileIcon.style.backgroundImage = 'none';
                 fileIcon.textContent = getFileIcon(file.type);
             }
             
             fileName.textContent = file.name;
             fileSize.textContent = formatFileSize(file.size);
-            fileType.textContent = getFileTypeName(file.type);
-            filePreview.style.display = 'block';
+            
+            // ファイルプレビューを表示し、ドロップゾーンの状態を更新
+            dropZone.classList.add('has-content');
+            filePreview.classList.add('show');
         }
         
         function clearPreview() {
             selectedFile = null;
-            filePreview.style.display = 'none';
+            dropZone.classList.remove('has-content');
+            filePreview.classList.remove('show');
             fileInput.value = '';
+            fileIcon.style.backgroundImage = 'none';
         }
         
         function getFileIcon(mimeType) {
             if (mimeType.startsWith('image/')) return 'IMG';
             if (mimeType.startsWith('video/')) return 'VID';
+            if (mimeType.startsWith('audio/')) return 'AUD';
             if (mimeType.includes('pdf')) return 'PDF';
             if (mimeType.includes('word')) return 'DOC';
             if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return 'XLS';
@@ -1322,15 +1333,6 @@
         window.addEventListener('beforeunload', () => {
             connections.forEach(conn => conn.close());
             if (peer) {
-                // Realtime Database から ID を削除
-                if (currentUser) {
-                    const db = window.firebaseAuth.db;
-                    const deviceRef = db.getDeviceRef(currentUser.id, peer.id);
-                    db.remove(deviceRef);
-                }
                 peer.destroy();
             }
         });
-    </script>
-</body>
-</html>
